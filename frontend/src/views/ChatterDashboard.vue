@@ -1,9 +1,9 @@
 <template>
   <div class="chatter-dashboard">
-    <div class="sidebar">
+    <div class="sidebar glass-panel" style="border-radius: 0; border-right: 1px solid var(--border-glass);">
       <div class="header">
         <h2>Dialogs</h2>
-        <button @click="logout" class="logout-btn">Logout</button>
+        <button @click="logout" class="btn" style="background: var(--danger); box-shadow: 0 4px 15px var(--danger-glow); padding: 5px 10px; font-size: 0.8rem;">Logout</button>
       </div>
       <div class="dialog-list">
         <div 
@@ -33,7 +33,7 @@
     
     <div class="chat-area">
       <div v-if="selectedDialog" class="chat-container">
-        <div class="chat-header">
+        <div class="chat-header glass-panel" style="border-radius: 0; border-bottom: 1px solid var(--border-glass);">
           <h3>Chatting as {{ selectedDialog.model.name }} with {{ selectedDialog.fan.name }}</h3>
         </div>
         
@@ -48,7 +48,7 @@
             class="message"
             :class="msg.sender_type"
           >
-            <div class="message-bubble">
+            <div class="message-bubble glass-panel">
               <div v-if="msg.is_ppv" class="ppv-badge">PPV: ${{ msg.price }}</div>
               {{ msg.text }}
             </div>
@@ -58,14 +58,14 @@
           </div>
         </div>
         
-        <div class="chat-input">
-          <textarea v-model="newMessageText" @keyup.enter.exact="sendMessage" placeholder="Type a message..."></textarea>
+        <div class="chat-input glass-panel" style="border-radius: 0; border-top: 1px solid var(--border-glass);">
+          <textarea v-model="newMessageText" @keyup.enter.exact="sendMessage" placeholder="Type a message..." class="input-glass" style="height: 60px; resize: none;"></textarea>
           <div class="actions">
             <div class="ppv-toggle">
               <label><input type="checkbox" v-model="isPpv" /> PPV</label>
-              <input v-if="isPpv" type="number" v-model.number="ppvPrice" placeholder="Price $" step="0.01" />
+              <input v-if="isPpv" type="number" v-model.number="ppvPrice" placeholder="Price $" step="0.01" class="input-glass" style="width: 100px; padding: 5px 10px;" />
             </div>
-            <button @click="sendMessage" :disabled="!newMessageText.trim()">Send</button>
+            <button @click="sendMessage" :disabled="!newMessageText.trim()" class="btn">Send</button>
           </div>
         </div>
       </div>
@@ -76,12 +76,12 @@
 
     <!-- Custom Delete Confirmation Modal -->
     <div v-if="showDeleteModal" class="modal-overlay">
-      <div class="modal-content">
+      <div class="modal-content glass-panel">
         <h3>Delete Chat</h3>
         <p>Are you sure you want to delete this chat with {{ dialogToDelete?.fan.name }}? This action cannot be undone.</p>
         <div class="modal-actions">
-          <button class="cancel-btn" @click="cancelDelete">Cancel</button>
-          <button class="confirm-btn" @click="confirmDelete">Delete</button>
+          <button class="btn" style="background: transparent; border: 1px solid var(--text-muted); color: var(--text-main); box-shadow: none;" @click="cancelDelete">Cancel</button>
+          <button class="btn" style="background: var(--danger); box-shadow: 0 4px 15px var(--danger-glow);" @click="confirmDelete">Delete</button>
         </div>
       </div>
     </div>
@@ -330,20 +330,16 @@ onUnmounted(() => {
 .chatter-dashboard {
   display: flex;
   height: 100vh;
-  background: var(--bg-color);
+  background: transparent;
 }
 .sidebar {
   width: 320px;
-  background: var(--panel-bg);
-  border-right: 1px solid var(--panel-border);
   display: flex;
   flex-direction: column;
-  backdrop-filter: blur(12px);
   z-index: 10;
 }
 .header {
   padding: 1.5rem;
-  border-bottom: 1px solid var(--panel-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -351,23 +347,8 @@ onUnmounted(() => {
 .header h2 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--text-main);
   letter-spacing: -0.5px;
-}
-.logout-btn {
-  background: rgba(239, 68, 68, 0.1);
-  color: var(--danger-color);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.logout-btn:hover {
-  background: var(--danger-color);
-  color: white;
 }
 .dialog-list {
   flex: 1;
@@ -386,12 +367,12 @@ onUnmounted(() => {
   border: 1px solid transparent;
 }
 .dialog-item:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: hsla(210, 40%, 98%, 0.05);
   transform: scale(1.02);
 }
 .dialog-item.active {
-  background: rgba(59, 130, 246, 0.15);
-  border-color: rgba(59, 130, 246, 0.3);
+  background: var(--accent-glow);
+  border-color: var(--accent);
 }
 .dialog-content {
   flex: 1;
@@ -404,7 +385,7 @@ onUnmounted(() => {
 }
 .dialog-info strong {
   font-weight: 500;
-  color: var(--text-primary);
+  color: var(--text-main);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -412,7 +393,7 @@ onUnmounted(() => {
 }
 .time {
   font-size: 0.75rem;
-  color: var(--text-secondary);
+  color: var(--text-muted);
 }
 .dialog-actions {
   display: flex;
@@ -424,7 +405,7 @@ onUnmounted(() => {
 .delete-btn {
   background: none;
   border: none;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   font-size: 1.25rem;
   line-height: 1;
   cursor: pointer;
@@ -439,21 +420,21 @@ onUnmounted(() => {
   opacity: 1;
 }
 .delete-btn:hover {
-  color: var(--danger-color);
+  color: var(--danger);
 }
 .badge {
-  background: var(--danger-color);
+  background: var(--danger);
   color: white;
   border-radius: 12px;
   padding: 0.25rem 0.5rem;
   font-size: 0.75rem;
   font-weight: 600;
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 10px var(--danger-glow);
   animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  0% { box-shadow: 0 0 0 0 var(--danger-glow); }
   70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
   100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
@@ -469,7 +450,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   font-size: 1.125rem;
 }
 .chat-container {
@@ -480,14 +461,12 @@ onUnmounted(() => {
 }
 .chat-header {
   padding: 1.5rem;
-  background: var(--panel-bg);
-  border-bottom: 1px solid var(--panel-border);
-  backdrop-filter: blur(12px);
   z-index: 5;
 }
 .chat-header h3 {
   font-size: 1.125rem;
   font-weight: 500;
+  color: var(--text-main);
 }
 .messages {
   flex: 1;
@@ -504,15 +483,15 @@ onUnmounted(() => {
   justify-content: center;
   gap: 0.5rem;
   padding: 1rem;
-  color: var(--accent-color);
+  color: var(--accent);
   font-size: 0.875rem;
 }
 .spinner {
   width: 24px;
   height: 24px;
-  border: 3px solid rgba(59, 130, 246, 0.3);
+  border: 3px solid var(--accent-glow);
   border-radius: 50%;
-  border-top-color: var(--accent-color);
+  border-top-color: var(--accent);
   animation: spin 1s ease-in-out infinite;
 }
 @keyframes spin {
@@ -538,23 +517,22 @@ onUnmounted(() => {
 }
 .message-bubble {
   padding: 0.875rem 1.25rem;
-  border-radius: 18px;
-  background: var(--message-bg);
-  color: var(--text-primary);
+  color: var(--text-main);
   line-height: 1.5;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  position: relative;
+  background: hsla(222, 47%, 16%, 0.6);
+  border: 1px solid var(--border-glass);
 }
 .message.fan .message-bubble {
   border-bottom-left-radius: 4px;
 }
 .message.chatter .message-bubble {
-  background: var(--chatter-msg-bg);
+  background: var(--accent-glow);
+  border-color: var(--accent);
   border-bottom-right-radius: 4px;
 }
 .message-meta {
   font-size: 0.75rem;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   margin-top: 0.375rem;
   margin-left: 0.5rem;
   margin-right: 0.5rem;
@@ -563,40 +541,19 @@ onUnmounted(() => {
   text-align: right;
 }
 .ppv-badge {
-  background: rgba(236, 72, 153, 0.2);
-  color: var(--ppv-color);
-  border: 1px solid rgba(236, 72, 153, 0.5);
+  background: hsla(330, 80%, 60%, 0.2);
+  color: hsl(330, 80%, 75%);
+  border: 1px solid hsla(330, 80%, 60%, 0.5);
   font-size: 0.75rem;
   padding: 0.25rem 0.5rem;
   border-radius: 6px;
   margin-bottom: 0.5rem;
   display: inline-block;
   font-weight: 600;
-  box-shadow: 0 0 8px rgba(236, 72, 153, 0.2);
+  box-shadow: 0 0 8px hsla(330, 80%, 60%, 0.2);
 }
 .chat-input {
   padding: 1.5rem;
-  background: var(--panel-bg);
-  border-top: 1px solid var(--panel-border);
-  backdrop-filter: blur(12px);
-}
-.chat-input textarea {
-  width: 100%;
-  height: 60px;
-  padding: 0.875rem;
-  border: 1px solid var(--panel-border);
-  border-radius: 12px;
-  resize: none;
-  background: rgba(15, 23, 42, 0.6);
-  color: var(--text-primary);
-  font-family: inherit;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-}
-.chat-input textarea:focus {
-  outline: none;
-  border-color: var(--accent-color);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 .actions {
   display: flex;
@@ -608,36 +565,14 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: var(--text-secondary);
-}
-.ppv-toggle input[type="number"] {
-  width: 100px;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--panel-border);
-  border-radius: 8px;
-  background: rgba(15, 23, 42, 0.6);
-  color: var(--text-primary);
-}
-.actions button {
-  padding: 0.75rem 2rem;
-  background: var(--accent-color);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-.actions button:hover:not(:disabled) {
-  background: var(--accent-hover);
-  transform: translateY(-1px);
+  color: var(--text-muted);
 }
 .actions button:disabled {
-  background: rgba(59, 130, 246, 0.3);
-  color: rgba(255, 255, 255, 0.5);
+  background: var(--bg-glass);
+  color: var(--text-muted);
   box-shadow: none;
   cursor: not-allowed;
+  border: 1px solid var(--border-glass);
 }
 
 /* Custom Modal Styles */
@@ -655,22 +590,18 @@ onUnmounted(() => {
   z-index: 1000;
 }
 .modal-content {
-  background: var(--panel-bg);
-  border: 1px solid var(--panel-border);
-  border-radius: 12px;
   padding: 1.5rem;
   max-width: 400px;
   width: 90%;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
   text-align: center;
 }
 .modal-content h3 {
   margin-top: 0;
-  color: white;
+  color: var(--text-main);
   margin-bottom: 1rem;
 }
 .modal-content p {
-  color: var(--text-secondary);
+  color: var(--text-muted);
   margin-bottom: 1.5rem;
   font-size: 0.95rem;
   line-height: 1.4;
@@ -680,28 +611,4 @@ onUnmounted(() => {
   gap: 1rem;
   justify-content: center;
 }
-.modal-actions button {
-  padding: 0.6rem 1.2rem;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s;
-}
-.cancel-btn {
-  background: transparent;
-  color: white;
-  border: 1px solid var(--text-secondary) !important;
-}
-.cancel-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-.confirm-btn {
-  background: var(--danger-color);
-  color: white;
-}
-.confirm-btn:hover {
-  filter: brightness(1.1);
-}
-
 </style>

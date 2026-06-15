@@ -1,12 +1,12 @@
 <template>
   <div class="teamlead-dashboard">
-    <div class="header">
+    <div class="header glass-panel" style="border-radius: 0; border-bottom: 1px solid var(--border-glass);">
       <h2>Teamlead Monitor</h2>
-      <button @click="logout" class="logout-btn">Logout</button>
+      <button @click="logout" class="btn" style="background: var(--danger); box-shadow: 0 4px 15px var(--danger-glow); padding: 5px 10px; font-size: 0.8rem;">Logout</button>
     </div>
     
     <div class="content">
-      <div class="stats-card">
+      <div class="stats-card glass-panel">
         <h3>Online Chatters</h3>
         <table v-if="chatters.length > 0">
           <thead>
@@ -32,14 +32,14 @@
         <p v-else class="no-data">No chatters online currently.</p>
       </div>
 
-      <div class="stats-card mt-4">
+      <div class="stats-card glass-panel mt-4">
         <h3>Testing Tools</h3>
         <p class="test-desc">Use this to simulate a new message from a Fan to test real-time WebSocket updates and overdue metrics.</p>
         
         <div class="test-options">
           <label class="test-label">
             Target Chatter:
-            <select v-model="emulateChatterId" class="emulate-select">
+            <select v-model="emulateChatterId" class="input-glass" style="width: auto; padding: 5px 10px;">
               <option :value="null">Any / Auto</option>
               <option v-for="c in chatters" :key="c.chatter_id" :value="c.chatter_id">
                 {{ c.chatter_name }}
@@ -53,8 +53,8 @@
         </div>
 
         <div class="test-actions">
-          <input type="text" v-model="emulateText" placeholder="Enter simulated message..." class="emulate-input" @keyup.enter="emulateFanMessage" />
-          <button @click="emulateFanMessage" class="emulate-btn" :disabled="isEmulating">
+          <input type="text" v-model="emulateText" placeholder="Enter simulated message..." class="input-glass" @keyup.enter="emulateFanMessage" />
+          <button @click="emulateFanMessage" class="btn" :disabled="isEmulating" style="white-space: nowrap;">
             {{ isEmulating ? 'Sending...' : 'Emulate Fan Message' }}
           </button>
         </div>
@@ -190,12 +190,9 @@ onUnmounted(() => {
 .teamlead-dashboard {
   min-height: 100vh;
   background: var(--bg-color);
-  font-family: var(--font-main);
+  font-family: var(--font-family);
 }
 .header {
-  background: var(--panel-bg);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--panel-border);
   padding: 1.5rem 2rem;
   display: flex;
   justify-content: space-between;
@@ -205,23 +202,8 @@ onUnmounted(() => {
   margin: 0;
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--text-main);
   letter-spacing: -0.5px;
-}
-.logout-btn {
-  background: rgba(239, 68, 68, 0.1);
-  color: var(--danger-color);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.logout-btn:hover {
-  background: var(--danger-color);
-  color: white;
 }
 .content {
   padding: 2rem;
@@ -229,19 +211,14 @@ onUnmounted(() => {
   margin: 0 auto;
 }
 .stats-card {
-  background: var(--panel-bg);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--panel-border);
   padding: 2rem;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
 }
 .stats-card h3 {
   margin-top: 0;
-  border-bottom: 1px solid var(--panel-border);
+  border-bottom: 1px solid var(--border-glass);
   padding-bottom: 1rem;
   margin-bottom: 1.5rem;
-  color: var(--text-primary);
+  color: var(--text-main);
   font-weight: 600;
 }
 table {
@@ -251,11 +228,11 @@ table {
 th, td {
   text-align: left;
   padding: 1.25rem 1rem;
-  border-bottom: 1px solid var(--panel-border);
-  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-glass);
+  color: var(--text-main);
 }
 th {
-  color: var(--text-secondary);
+  color: var(--text-muted);
   font-weight: 500;
   font-size: 0.875rem;
   text-transform: uppercase;
@@ -265,22 +242,22 @@ th {
     transition: background-color 0.2s ease;
   }
   tbody tr:hover {
-    background: rgba(255, 255, 255, 0.03);
+    background: hsla(210, 40%, 98%, 0.03);
   }
 .has-overdue {
-  background: rgba(239, 68, 68, 0.1);
+  background: hsla(348, 83%, 55%, 0.1);
   animation: bg-pulse 2s infinite alternate;
 }
 @keyframes bg-pulse {
-  from { background: rgba(239, 68, 68, 0.05); }
-  to { background: rgba(239, 68, 68, 0.15); }
+  from { background: hsla(348, 83%, 55%, 0.05); }
+  to { background: hsla(348, 83%, 55%, 0.15); }
 }
 .overdue-cell {
   font-weight: 600;
 }
 .has-overdue .overdue-cell {
-  color: var(--danger-color);
-  text-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+  color: var(--danger);
+  text-shadow: 0 0 8px var(--danger-glow);
 }
 .warning-icon {
   margin-right: 0.5rem;
@@ -293,7 +270,7 @@ th {
   75% { transform: translateX(2px); }
 }
 .no-data {
-  color: var(--text-secondary);
+  color: var(--text-muted);
   text-align: center;
   padding: 3rem;
   font-size: 1.125rem;
@@ -302,7 +279,7 @@ th {
   margin-top: 1.5rem;
 }
 .test-desc {
-  color: var(--text-secondary);
+  color: var(--text-muted);
   font-size: 0.875rem;
   margin-bottom: 1rem;
 }
@@ -316,21 +293,8 @@ th {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   font-size: 0.875rem;
-}
-.emulate-select {
-  padding: 0.4rem 0.75rem;
-  border-radius: 6px;
-  border: 1px solid var(--panel-border);
-  background: rgba(15, 23, 42, 0.5);
-  color: white;
-  font-family: inherit;
-  font-size: 0.875rem;
-}
-.emulate-select:focus {
-  outline: none;
-  border-color: var(--accent-color);
 }
 .checkbox-label {
   cursor: pointer;
@@ -342,45 +306,13 @@ th {
   display: flex;
   gap: 1rem;
 }
-.emulate-input {
-  flex: 1;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  border: 1px solid var(--panel-border);
-  background: rgba(15, 23, 42, 0.5);
-  color: white;
-  font-size: 1rem;
-  font-family: inherit;
-}
-.emulate-input:focus {
-  outline: none;
-  border-color: var(--accent-color);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-}
-.emulate-btn {
-  background: var(--accent-color);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 0 1.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-.emulate-btn:hover:not(:disabled) {
-  background: var(--accent-hover);
-}
-.emulate-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
 .success-msg {
-  color: #10b981;
+  color: var(--success);
   font-size: 0.875rem;
   margin-top: 0.5rem;
 }
 .error-msg {
-  color: var(--danger-color);
+  color: var(--danger);
   font-size: 0.875rem;
   margin-top: 0.5rem;
 }
