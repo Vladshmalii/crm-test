@@ -8,11 +8,10 @@ class Command(BaseCommand):
     help = 'Seed demo data for CRM'
 
     def handle(self, *args, **options):
-        self.stdout.write("Deleting old data...")
-        User.objects.all().delete()
-        Model.objects.all().delete()
-        Fan.objects.all().delete()
-        
+        if User.objects.filter(username='chatter1').exists():
+            self.stdout.write(self.style.SUCCESS('Demo data already exists! Skipping seed.'))
+            return
+            
         self.stdout.write("Creating Users...")
         teamlead = User.objects.create_user(username='teamlead', password='password123', role='teamlead')
         chatter1 = User.objects.create_user(username='chatter1', password='password123', role='chatter')
