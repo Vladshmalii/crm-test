@@ -1,0 +1,47 @@
+databases:
+  - name: crm-db
+    databaseName: crm_db
+    user: crm_user
+    plan: free
+
+services:
+  - type: redis
+    name: crm-redis
+    plan: free
+    ipAllowList: []
+    maxmemoryPolicy: noeviction
+
+  - type: web
+    name: crm-backend
+    env: python
+    buildCommand: "./backend/build.sh"
+    startCommand: "cd backend && daphne -b 0.0.0.0 -p $PORT config.asgi:application"
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: crm-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: crm-redis
+          property: connectionString
+      - key: OVERDUE_THRESHOLD_MINUTES
+        value: "1"
+      - key: PRESENCE_GRACE_SECONDS
+        value: "10"
+      - key: CORS_ALLOWED_ORIGINS
+        value: "https://crm-frontend-7dnc.onrender.com"
+
+  - type: web
+    name: crm-frontend
+    env: node
+    buildCommand: "cd frontend && npm install && npm run build"
+    startCommand: "cd frontend && npm run preview -- --host 0.0.0.0 --port $PORT"
+    plan: free
+    envVars:
+      - key: VITE_API_URL
+        value: "https://crm-backend-cxxp.onrender.com/api"
+      - key: VITE_WS_URL
+        value: "wss://crm-backend-cxxp.onrender.com/ws/crm/"
