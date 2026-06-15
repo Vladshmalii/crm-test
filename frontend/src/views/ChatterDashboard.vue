@@ -105,6 +105,7 @@ const dialogs = ref([])
 const selectedDialog = ref(null)
 const messages = ref([])
 const newMessageText = ref('')
+const drafts = ref({})
 const isPpv = ref(false)
 const ppvPrice = ref(null)
 
@@ -153,9 +154,17 @@ const fetchMessages = async (dialogId, cursor = null) => {
 }
 
   const selectDialog = async (dialog) => {
+    // Save draft for previous dialog
+    if (selectedDialog.value) {
+      drafts.value[selectedDialog.value.id] = newMessageText.value
+    }
+    
     selectedDialog.value = dialog
     messages.value = [] // clear before load
     nextCursor.value = null
+    
+    // Restore draft for new dialog
+    newMessageText.value = drafts.value[dialog.id] || ''
 
     
     // clear unread locally immediately
@@ -234,6 +243,9 @@ const sendMessage = () => {
   ws.send(JSON.stringify(payload))
   
   newMessageText.value = ''
+  if (selectedDialog.value) {
+    drafts.value[selectedDialog.value.id] = ''
+  }
   isPpv.value = false
   ppvPrice.value = null
 }
