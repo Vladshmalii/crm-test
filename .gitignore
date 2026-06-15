@@ -1,0 +1,16 @@
+# Backend
+backend/venv/
+backend/__pycache__/
+backend/*.pyc
+backend/db.sqlite3
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Env
+.env
+
+rewrite_history.py
+.vscode/
+.gemini/
