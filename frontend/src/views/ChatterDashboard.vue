@@ -81,11 +81,29 @@
         <div class="chat-input glass-panel" style="border-radius: 0; border-top: 1px solid var(--border-glass);">
           <textarea v-model="newMessageText" @keyup.enter.exact="sendMessage" placeholder="Type a message..." class="input-glass" style="height: 60px; resize: none;"></textarea>
           <div class="actions">
-            <div class="ppv-toggle">
-              <label><input type="checkbox" v-model="isPpv" /> PPV</label>
-              <input v-if="isPpv" type="number" v-model.number="ppvPrice" placeholder="Price $" step="0.01" class="input-glass" style="width: 100px; padding: 5px 10px;" />
+            <div class="ppv-toggle-container">
+              <label class="ppv-switch-label" :class="{ 'is-active': isPpv }">
+                <input type="checkbox" v-model="isPpv" class="hidden-checkbox" />
+                <div class="ppv-switch-track">
+                  <div class="ppv-switch-knob">
+                    <svg v-if="isPpv" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>
+                  </div>
+                </div>
+                <span class="ppv-switch-text">Paid Message</span>
+              </label>
+              
+              <transition name="fade-slide">
+                <div v-if="isPpv" class="price-input-wrapper">
+                  <span class="currency-symbol">$</span>
+                  <input type="number" v-model.number="ppvPrice" placeholder="0.00" step="0.01" class="price-input" />
+                </div>
+              </transition>
             </div>
-            <button @click="sendMessage" :disabled="!newMessageText.trim()" class="btn">Send</button>
+            <button @click="sendMessage" :disabled="!newMessageText.trim()" class="btn send-btn">
+              <span>Send</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
           </div>
         </div>
       </div>
@@ -652,18 +670,139 @@ onUnmounted(() => {
   align-items: center;
   margin-top: 1rem;
 }
-.ppv-toggle {
+.ppv-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.hidden-checkbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.ppv-switch-label {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+}
+.ppv-switch-track {
+  width: 44px;
+  height: 24px;
+  background: hsla(222, 47%, 30%, 0.5);
+  border: 1px solid var(--border-glass);
+  border-radius: 20px;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+.ppv-switch-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--bg-color);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+.ppv-switch-label.is-active .ppv-switch-track {
+  background: linear-gradient(135deg, hsl(330, 80%, 60%), hsl(280, 80%, 60%));
+  border-color: transparent;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1), 0 0 10px hsla(330, 80%, 60%, 0.4);
+}
+.ppv-switch-label.is-active .ppv-switch-knob {
+  transform: translateX(20px);
+  background: white;
+  color: hsl(330, 80%, 50%);
+}
+.ppv-switch-text {
+  font-size: 0.9rem;
+  font-weight: 500;
   color: var(--text-muted);
+  transition: color 0.3s;
+}
+.ppv-switch-label.is-active .ppv-switch-text {
+  color: var(--text-main);
+  text-shadow: 0 0 10px hsla(330, 80%, 75%, 0.5);
+}
+
+.price-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.currency-symbol {
+  position: absolute;
+  left: 12px;
+  color: hsl(330, 80%, 75%);
+  font-weight: 700;
+  font-size: 0.95rem;
+  z-index: 1;
+}
+.price-input {
+  width: 110px;
+  padding: 8px 12px 8px 26px;
+  background: hsla(330, 80%, 15%, 0.3);
+  border: 1px solid hsla(330, 80%, 50%, 0.4);
+  border-radius: 8px;
+  color: var(--text-main);
+  font-weight: 600;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.3s;
+  box-shadow: 0 2px 8px hsla(330, 80%, 50%, 0.1);
+}
+.price-input:focus {
+  border-color: hsl(330, 80%, 60%);
+  box-shadow: 0 0 0 2px hsla(330, 80%, 60%, 0.2), 0 2px 8px hsla(330, 80%, 50%, 0.1);
+  background: hsla(330, 80%, 15%, 0.5);
+}
+.price-input::placeholder {
+  color: hsla(330, 80%, 75%, 0.5);
+}
+
+/* Chrome, Safari, Edge, Opera */
+.price-input::-webkit-outer-spin-button,
+.price-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Firefox */
+.price-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.3s ease;
+}
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+.send-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 8px 16px;
 }
 .actions button:disabled {
-  background: var(--bg-glass);
+  background: hsla(222, 47%, 30%, 0.3);
   color: var(--text-muted);
   box-shadow: none;
   cursor: not-allowed;
-  border: 1px solid var(--border-glass);
+  border: 1px solid transparent;
+  opacity: 0.5;
 }
 
 /* Custom Modal Styles */
