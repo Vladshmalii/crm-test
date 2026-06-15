@@ -42,6 +42,6 @@ services:
     plan: free
     envVars:
       - key: VITE_API_URL
-        value: "https://crm-backend-cxxp.onrender.com/api"
+        value: "https://crm-backend-cxxp.onrender.com"
       - key: VITE_WS_URL
-        value: "wss://crm-backend-cxxp.onrender.com/ws/crm/"
+        value: "wss://crm-backend-cxxp.onrender.com"

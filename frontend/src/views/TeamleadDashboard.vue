@@ -136,7 +136,8 @@ const emulateFanMessage = async () => {
 
 const connectWebSocket = () => {
   const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-  const wsUrl = `${wsProtocol}//localhost:8000/ws/crm/?token=${authStore.token}`
+  const wsBaseUrl = import.meta.env.VITE_WS_URL || `${wsProtocol}//localhost:8000`
+  const wsUrl = `${wsBaseUrl}/ws/crm/?token=${authStore.token}`
   
   ws = new WebSocket(wsUrl)
   
