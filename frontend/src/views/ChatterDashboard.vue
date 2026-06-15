@@ -52,9 +52,25 @@
             class="message"
             :class="msg.sender_type"
           >
-            <div class="message-bubble glass-panel">
-              <div v-if="msg.is_ppv" class="ppv-badge">PPV: ${{ msg.price }}</div>
-              {{ msg.text }}
+            <div 
+              class="message-bubble glass-panel"
+              :class="{ 'is-ppv-bubble': msg.is_ppv }"
+            >
+              <template v-if="msg.is_ppv">
+                <div class="ppv-header">
+                  <div class="ppv-icon-wrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                  </div>
+                  <span class="ppv-title">Locked Content</span>
+                  <span class="ppv-price">${{ msg.price }}</span>
+                </div>
+                <div class="ppv-content">
+                  {{ msg.text }}
+                </div>
+              </template>
+              <template v-else>
+                {{ msg.text }}
+              </template>
             </div>
             <div class="message-meta">
               {{ formatTime(msg.created_at) }}
@@ -574,17 +590,58 @@ onUnmounted(() => {
 .message.chatter .message-meta {
   text-align: right;
 }
-.ppv-badge {
+.is-ppv-bubble {
+  background: linear-gradient(135deg, hsla(330, 80%, 15%, 0.8), hsla(280, 80%, 15%, 0.8)) !important;
+  border: 1px solid hsla(330, 80%, 50%, 0.4) !important;
+  box-shadow: 0 4px 20px hsla(330, 80%, 50%, 0.15), inset 0 0 0 1px hsla(330, 80%, 60%, 0.2) !important;
+  padding: 1rem 1.25rem;
+}
+.ppv-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid hsla(330, 80%, 60%, 0.2);
+}
+.ppv-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, hsl(330, 80%, 60%), hsl(280, 80%, 60%));
+  border-radius: 50%;
+  color: white;
+  box-shadow: 0 0 10px hsla(330, 80%, 60%, 0.5);
+}
+.ppv-icon-wrap svg {
+  width: 12px;
+  height: 12px;
+}
+.ppv-title {
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: linear-gradient(to right, hsl(330, 80%, 75%), hsl(280, 80%, 75%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.ppv-price {
+  margin-left: auto;
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: hsl(330, 80%, 85%);
   background: hsla(330, 80%, 60%, 0.2);
-  color: hsl(330, 80%, 75%);
-  border: 1px solid hsla(330, 80%, 60%, 0.5);
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 6px;
-  margin-bottom: 0.5rem;
-  display: inline-block;
-  font-weight: 600;
-  box-shadow: 0 0 8px hsla(330, 80%, 60%, 0.2);
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  border: 1px solid hsla(330, 80%, 60%, 0.3);
+}
+.ppv-content {
+  color: hsl(330, 20%, 95%);
+  font-size: 0.95rem;
+  line-height: 1.6;
 }
 .chat-input {
   padding: 1.5rem;
