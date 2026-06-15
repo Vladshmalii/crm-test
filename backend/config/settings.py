@@ -59,7 +59,18 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-if os.environ.get('DB_HOST'):
+if os.environ.get('DATABASE_URL'):
+    import urllib.parse
+    url = urllib.parse.urlparse(os.environ.get('DATABASE_URL'))
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': url.path[1:],
+        'USER': url.username,
+        'PASSWORD': url.password,
+        'HOST': url.hostname,
+        'PORT': url.port or '5432',
+    }
+elif os.environ.get('DB_HOST'):
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.environ.get('DB_NAME', 'crm_db'),
