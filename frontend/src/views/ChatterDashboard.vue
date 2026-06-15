@@ -18,6 +18,10 @@
               <strong>{{ dialog.model.name }} & {{ dialog.fan.name }}</strong>
               <span class="time">{{ formatTime(dialog.last_message_at) }}</span>
             </div>
+            <div v-if="dialog.last_message" class="last-message-preview">
+              <span class="sender-name">{{ dialog.last_message.sender_type === 'fan' ? dialog.fan.name : dialog.model.name }}: </span>
+              <span class="msg-text">{{ dialog.last_message.text }}</span>
+            </div>
           </div>
           <div class="dialog-actions">
             <button @click.stop="promptDeleteDialog(dialog)" class="delete-btn" title="Delete Chat">
@@ -266,6 +270,10 @@ const connectWebSocket = () => {
       if (dialogIdx !== -1) {
         const dialog = dialogs.value[dialogIdx]
         dialog.last_message_at = msg.created_at
+        dialog.last_message = {
+          text: msg.text,
+          sender_type: msg.sender_type
+        }
         
         if (selectedDialog.value && selectedDialog.value.id === data.dialog_id) {
            if (msg.sender_type === 'fan') {
@@ -394,6 +402,20 @@ onUnmounted(() => {
 .time {
   font-size: 0.75rem;
   color: var(--text-muted);
+}
+.last-message-preview {
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+.last-message-preview .sender-name {
+  font-weight: 600;
+  color: var(--text-main);
+  opacity: 0.8;
 }
 .dialog-actions {
   display: flex;
