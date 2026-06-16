@@ -15,11 +15,11 @@
         >
           <div class="dialog-content">
             <div class="dialog-info">
-              <strong>{{ dialog.model.name }} & {{ dialog.fan.name }}</strong>
+              <strong>{{ dialog.persona.name }} & {{ dialog.fan.name }}</strong>
               <span class="time">{{ formatTime(dialog.last_message_at) }}</span>
             </div>
             <div v-if="dialog.last_message" class="last-message-preview">
-              <span class="sender-name">{{ dialog.last_message.sender_type === 'fan' ? dialog.fan.name : dialog.model.name }}: </span>
+              <span class="sender-name">{{ dialog.last_message.sender_type === 'fan' ? dialog.fan.name : dialog.persona.name }}: </span>
               <span class="msg-text">{{ dialog.last_message.text }}</span>
             </div>
           </div>
@@ -38,7 +38,7 @@
     <div class="chat-area">
       <div v-if="selectedDialog" class="chat-container">
         <div class="chat-header glass-panel" style="border-radius: 0; border-bottom: 1px solid var(--border-glass);">
-          <h3>Chatting as {{ selectedDialog.model.name }} with {{ selectedDialog.fan.name }}</h3>
+          <h3>Chatting as {{ selectedDialog.persona.name }} with {{ selectedDialog.fan.name }}</h3>
         </div>
         
         <div class="messages" ref="messagesContainer" @scroll="handleScroll">
@@ -112,7 +112,7 @@
       </div>
     </div>
 
-    <!-- Custom Delete Confirmation Modal -->
+
     <div v-if="showDeleteModal" class="modal-overlay">
       <div class="modal-content glass-panel">
         <h3>Delete Chat</h3>
@@ -292,15 +292,9 @@ const connectWebSocket = () => {
   ws = new WebSocket(wsUrl)
   
   ws.onopen = () => {
-    console.log('WebSocket connected')
     if (reconnectTimer) clearTimeout(reconnectTimer)
-    
-    // On reconnect, fetch dialogs to get updated unread counts
     fetchDialogs()
     if (selectedDialog.value) {
-       // Ideally we'd fetch only missed messages, but re-fetching current page is simpler for now
-       // Or we can rely on REST call to get latest
-       // For reliability:
        fetchMessages(selectedDialog.value.id)
     }
   }
@@ -352,7 +346,6 @@ const connectWebSocket = () => {
   }
   
   ws.onclose = () => {
-    console.log('WebSocket disconnected. Reconnecting in 3s...')
     reconnectTimer = setTimeout(connectWebSocket, 3000)
   }
 }

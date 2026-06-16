@@ -1,34 +1,75 @@
 import os
+from typing import Dict, List
+
 import redis
 from django.conf import settings
+from django.db.models import Max, OuterRef, QuerySet, Subquery
 from django.utils import timezone
-from .models import Dialog
 
-redis_client = redis.from_url(os.environ.get('REDIS_URL', 'redis://localhost:6379/0'))
+from crm.choices import SenderType
 
-def set_user_online(user_id):
-    key = f"presence_user_{user_id}"
-    redis_client.setex(key, settings.PRESENCE_GRACE_SECONDS, 'online')
 
-def is_user_online(user_id):
-    return redis_client.exists(f"presence_user_{user_id}")
+def get_redis_client():
+    return redis.from_url(os.environ.get('REDIS_URL', 'redis://localhost:6379/0'))
 
-def get_online_users(user_ids):
-    online_status = {}
-    for uid in user_ids:
-        online_status[uid] = is_user_online(uid)
-    return online_status
 
-def is_dialog_overdue(dialog):
-    last_msg = dialog.messages.order_by('-created_at').first()
-    if not last_msg or last_msg.sender_type == 'chatter':
-        return False
-    delta = timezone.now() - last_msg.created_at
-    return delta.total_seconds() > (settings.OVERDUE_THRESHOLD_MINUTES * 60)
+class PresenceService:
+    PRESENCE_KEY_PREFIX = 'presence_user_'
 
-def calculate_overdue_dialogs_count(dialogs):
-    count = 0
-    for d in dialogs:
-        if is_dialog_overdue(d):
-            count += 1
-    return count
+    def __init__(self, redis_client=None):
+        self._redis = redis_client or get_redis_client()
+
+    def set_online(self, user_id: int) -> None:
+        key = f"{self.PRESENCE_KEY_PREFIX}{user_id}"
+        self._redis.setex(key, settings.PRESENCE_GRACE_SECONDS, 'online')
+
+    def set_offline(self, user_id: int) -> None:
+        self._redis.delete(f"{self.PRESENCE_KEY_PREFIX}{user_id}")
+
+    def is_online(self, user_id: int) -> bool:
+        return bool(self._redis.exists(f"{self.PRESENCE_KEY_PREFIX}{user_id}"))
+
+    def get_online_statuses(self, user_ids: List[int]) -> Dict[int, bool]:
+        if not user_ids:
+            return {}
+
+        pipe = self._redis.pipeline(transaction=False)
+        for uid in user_ids:
+            pipe.exists(f"{self.PRESENCE_KEY_PREFIX}{uid}")
+        results = pipe.execute()
+
+        return {uid: bool(status) for uid, status in zip(user_ids, results)}
+
+
+class OverdueService:
+    def __init__(self, threshold_minutes: int = None):
+        self._threshold_minutes = threshold_minutes or settings.OVERDUE_THRESHOLD_MINUTES
+
+    @property
+    def threshold_seconds(self) -> int:
+        return self._threshold_minutes * 60
+
+    def get_overdue_cutoff(self):
+        return timezone.now() - timezone.timedelta(seconds=self.threshold_seconds)
+
+    def annotate_dialogs_with_last_fan_message(self, dialogs_qs: QuerySet) -> QuerySet:
+        from crm.models import Message
+
+        last_fan_msg_subquery = Message.objects.filter(
+            dialog=OuterRef('pk'),
+            sender_type=SenderType.FAN,
+        ).order_by('-created_at').values('created_at')[:1]
+
+        return dialogs_qs.annotate(
+            last_fan_message_at=Subquery(last_fan_msg_subquery),
+        )
+
+    def is_dialog_overdue(self, last_fan_message_at) -> bool:
+        if not last_fan_message_at:
+            return False
+        delta = timezone.now() - last_fan_message_at
+        return delta.total_seconds() > self.threshold_seconds
+
+
+presence_service = PresenceService()
+overdue_service = OverdueService()

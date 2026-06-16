@@ -75,8 +75,6 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 const chatters = ref([])
-// We could fetch this from backend if we want, for UI display:
-const overdueThreshold = ref(1) // Default or env matched
 
 const emulateText = ref('')
 const emulateChatterId = ref(null)
@@ -142,18 +140,15 @@ const connectWebSocket = () => {
   ws = new WebSocket(wsUrl)
   
   ws.onopen = () => {
-    console.log('Teamlead WebSocket connected')
     if (reconnectTimer) clearTimeout(reconnectTimer)
     fetchOverview()
   }
   
-  ws.onmessage = (event) => {
-    // Whenever a chat message happens, or presence update, we can refresh the overview
+  ws.onmessage = () => {
     fetchOverview()
   }
   
   ws.onclose = () => {
-    console.log('WebSocket disconnected. Reconnecting in 3s...')
     reconnectTimer = setTimeout(connectWebSocket, 3000)
   }
 }
